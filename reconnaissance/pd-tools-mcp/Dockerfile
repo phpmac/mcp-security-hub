@@ -24,6 +24,8 @@ RUN apk add --no-cache \
 # Set Go environment
 ENV GOPATH=/home/node/go
 ENV PATH=$PATH:$GOPATH/bin
+# @latest tools may require a newer Go than the apk package ships
+ENV GOTOOLCHAIN=auto
 
 # Switch to non-root user for Go installations
 USER node

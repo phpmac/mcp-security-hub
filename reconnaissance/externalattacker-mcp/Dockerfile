@@ -15,6 +15,8 @@ RUN apt-get update && \
 ENV GOPATH=/go
 ENV PATH="/go/bin:$PATH"
 ENV CGO_ENABLED=1
+# @latest tools may require a newer Go than the distro package ships
+ENV GOTOOLCHAIN=auto
 
 # Install ProjectDiscovery tools
 RUN go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest && \
