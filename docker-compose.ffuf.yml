@@ -1,0 +1,39 @@
+# FFUF-only deployment: build and run just the ffuf-mcp server.
+# Usage:
+#   docker compose -f docker-compose.ffuf.yml up -d --build
+#   docker compose -f docker-compose.ffuf.yml logs -f ffuf-mcp
+#
+# NOTE: server.py is a stdio MCP server (no HTTP listener). The container idles
+# with stdin held open, waiting for a client to attach. To publish it over HTTP,
+# front it with an MCP stdio-to-HTTP bridge (e.g. supergateway) behind auth.
+services:
+  ffuf-mcp:
+    build:
+      context: ./web-security/ffuf-mcp
+      dockerfile: Dockerfile
+    image: ffuf-mcp:latest
+    container_name: ffuf-mcp
+    environment:
+      - FFUF_OUTPUT_DIR=/app/output
+      - FFUF_TIMEOUT=${FFUF_TIMEOUT:-600}
+      - FFUF_THREADS=${FFUF_THREADS:-40}
+    volumes:
+      - ffuf-output:/app/output
+      - ffuf-wordlists:/app/wordlists
+    stdin_open: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+
+volumes:
+  ffuf-output:
+    driver: local
+  ffuf-wordlists:
+    driver: local
